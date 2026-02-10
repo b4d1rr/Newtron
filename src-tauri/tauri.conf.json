@@ -1,0 +1,42 @@
+{
+  "productName": "Newtron",
+  "version": "0.1.0",
+  "identifier": "com.newtron.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Newtron",
+        "width": 700,
+        "height": 600,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "center": true,
+        "alwaysOnTop": true,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
