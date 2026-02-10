@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-# Tauri + React + Typescript
-
-This template should help get you started developing with Tauri, React and Typescript in Vite.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
-=======
 🚀 Newtron
 The Universal AI Command Bar.
 Newtron is a system-wide, ultra-lightweight interface that bridges the gap between your local machine and the world's most powerful AI models. Built with Rust for speed and TypeScript for agility, it’s designed to be the only search bar you’ll ever need.
@@ -67,4 +58,3 @@ No Middleman: Your queries go directly from your machine to the AI provider.
 Newtron is currently a closed-contribution project while we finalize the architectural foundation. Stay tuned for the open-source call to action.
 
 Newtron — Your computer’s new central nervous system.
->>>>>>> 7e9af1dac495e3ccb60237fad0d9f73b09235c35
