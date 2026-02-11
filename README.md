@@ -6,7 +6,7 @@ One keystroke. Total control. No API fees.
 
 Current Status: 🏗️ Under Active Development
 
-Last Updated: Feb 10, 2026 (GMT+3)
+Last Updated: Feb 11, 2026 (GMT+3)
 
 🧠 The Vision
 Most productivity tools are either too heavy (Electron bloat) or too expensive (API markups). Newtron flips the script by using a Zero-API Architecture. It leverages your existing AI accounts via secure, hidden sessions, giving you a premium AI experience for the cost of... nothing.
