@@ -64,7 +64,7 @@ function App() {
               setInput(e.target.value);
               handleSearch(e.target.value);
             }}
-            placeholder="Search or ask AI..."
+            placeholder="Search or ask Newtron..."
             className="search-input"
           />
         </div>
