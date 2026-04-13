@@ -1,4 +1,4 @@
-🚀 Newtron
+Newtron
 The Universal AI Command Bar.
 Newtron is a system-wide, ultra-lightweight interface that bridges the gap between your local machine and the world's most powerful AI models. Built with Rust for speed and TypeScript for agility, it’s designed to be the only search bar you’ll ever need.
 
@@ -6,12 +6,12 @@ One keystroke. Total control. No API fees.
 
 Current Status: 🏗️ Under Active Development
 
-Last Updated: Feb 11, 2026 (GMT+3)
+Last Updated: Apr 12, 2026 (GMT+3)
 
-🧠 The Vision
+The Vision
 Most productivity tools are either too heavy (Electron bloat) or too expensive (API markups). Newtron flips the script by using a Zero-API Architecture. It leverages your existing AI accounts via secure, hidden sessions, giving you a premium AI experience for the cost of... nothing.
 
-✨ Features
+Features
 Universal Search: Instant access to local files, apps, system settings, and Git repositories.
 
 AI Threading: Query ChatGPT, Claude, or Gemini instantly. Results appear in a beautiful, scrollable result box.
@@ -47,14 +47,14 @@ Roadmap to Alpha:
 
 [ ] Public Alpha Release.
 
-🛡️ Privacy & Security
+Privacy & Security
 Local stays local: File indexing happens entirely on your machine.
 
 Session Security: Your AI login sessions are handled via your system's native keychain (AES-256).
 
 No Middleman: Your queries go directly from your machine to the AI provider.
 
-🤝 Contributing
+Contributing
 Newtron is currently a closed-contribution project while we finalize the architectural foundation. Stay tuned for the open-source call to action.
 
 Newtron — Your computer’s new central nervous system.
