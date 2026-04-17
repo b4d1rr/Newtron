@@ -18,7 +18,7 @@ AI Threading: Query ChatGPT, Claude, or Gemini instantly. Results appear in a be
 
 Performance First: Powered by Tauri, ensuring minimal RAM and CPU usage while staying "always-on."
 
-Keyboard-Centric: Triggered by a global shortcut (Alt + Space), keeping your hands on the keys and your flow intact.
+Keyboard-Centric: Triggered by a global shortcut (Alt + N), keeping your hands on the keys and your flow intact.
 
 Visual Excellence: Awwwards-level Glassmorphism UI with fluid animations.
 
