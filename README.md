@@ -1,60 +1,140 @@
-Newtron
-The Universal AI Command Bar.
-Newtron is a system-wide, ultra-lightweight interface that bridges the gap between your local machine and the world's most powerful AI models. Built with Rust for speed and TypeScript for agility, it’s designed to be the only search bar you’ll ever need.
+<div align="center">
 
-One keystroke. Total control. No API fees.
+# ⚡ Newtron
 
-Current Status: 🏗️ Under Active Development
+### Your computer's new central nervous system.
 
-Last Updated: Apr 12, 2026 (GMT+3)
+**One keystroke. Every tool. Zero tab switching.**
 
-The Vision
-Most productivity tools are either too heavy (Electron bloat) or too expensive (API markups). Newtron flips the script by using a Zero-API Architecture. It leverages your existing AI accounts via secure, hidden sessions, giving you a premium AI experience for the cost of... nothing.
+![Status](https://img.shields.io/badge/status-under%20active%20development-yellow?style=flat-square)
+![Stack](https://img.shields.io/badge/stack-Rust%20%2B%20TypeScript-blue?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
+![Last Updated](https://img.shields.io/badge/updated-April%202026-lightgrey?style=flat-square)
 
-Features
-Universal Search: Instant access to local files, apps, system settings, and Git repositories.
+</div>
 
-AI Threading: Query ChatGPT, Claude, or Gemini instantly. Results appear in a beautiful, scrollable result box.
+---
 
-Performance First: Powered by Tauri, ensuring minimal RAM and CPU usage while staying "always-on."
+## What is Newtron?
 
-Keyboard-Centric: Triggered by a global shortcut (Alt + N), keeping your hands on the keys and your flow intact.
+Newtron is a system-wide command bar built for people who live on their keyboard. Press `Alt + N` from anywhere on your machine and get instant access to your files, apps, the web, and every AI you use — all in one fast, lightweight interface.
 
-Visual Excellence: Awwwards-level Glassmorphism UI with fluid animations.
+No Electron bloat. No subscription. No switching tabs.
 
-E2E Security: Your credentials stay in your OS keychain. We never store your chats.
+Built with **Rust** for performance and **React + TypeScript** for a fluid, modern UI.
 
-⚙️ Tech Stack
-Core: Rust (Tauri)
+---
 
-Frontend: React + TypeScript
+## Features
 
-Styling: TailwindCSS + Framer Motion
+### 🧠 AI Command Bar
+Connect your own API keys for OpenAI, Anthropic, or Gemini — stored securely in your OS keychain, never on our servers. Switch models mid-session directly from the bar.
 
-Database: SQLite (Local indexing)
+```
+@claude explain this function
+@gpt4o rewrite this email
+@local summarize my clipboard
+```
 
-Automation: Playwright/DOM Injection logic
+No account required to get started. Newtron ships with a built-in local AI (via Ollama) that works instantly, offline, and for free.
 
-🛠️ Status & Installation
-[!CAUTION] UNDER ACTIVE DEVELOPMENT > Newtron is currently in a "stealth" development phase. We are not providing public binaries or installation tutorials at this time to ensure the core engine is stable before the first alpha release.
+### 🌐 Web Search in the Dropdown
+Type a query, see Google results rendered directly inside Newtron. No browser switch. No context loss.
 
-Roadmap to Alpha:
-[ ] Stabilize Rust-based global shortcut listeners.
+### 📁 Lightning-Fast File Search
+Rust-powered local file indexer backed by SQLite. Finds anything on your machine in milliseconds — files, folders, Git repos, system settings.
 
-[ ] Finalize the "Zero-API" WebView injection logic.
+### 🚀 App Launcher
+Launch any application from the bar. No mouse required.
 
-[ ] Complete the Glassmorphism UI kit.
+### 🔒 Private by Design
+- File indexing happens entirely on your machine
+- API keys live in your OS keychain (AES-256)
+- Your queries go directly to the AI provider — no middleman, no logging
+- Local AI mode means nothing leaves your machine at all
 
-[ ] Public Alpha Release.
+---
 
-Privacy & Security
-Local stays local: File indexing happens entirely on your machine.
+## How It Works
 
-Session Security: Your AI login sessions are handled via your system's native keychain (AES-256).
+```
+Press Alt + N from anywhere
+           ↓
+┌──────────────────────────────┐
+│  > ________________________  │
+├──────────────────────────────┤
+│  🧠  Ask AI                 │
+│  🌐  Search Google          │
+│  📁  Files matching...      │
+│  🚀  Launch App             │
+└──────────────────────────────┘
+```
 
-No Middleman: Your queries go directly from your machine to the AI provider.
+One input. Every result type. You choose what to act on.
 
-Contributing
-Newtron is currently a closed-contribution project while we finalize the architectural foundation. Stay tuned for the open-source call to action.
+---
 
-Newtron — Your computer’s new central nervous system.
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Core | Rust (Tauri) |
+| Frontend | React + TypeScript |
+| Styling | TailwindCSS + Framer Motion |
+| Local AI | Ollama |
+| Cloud AI | OpenAI / Anthropic / Gemini (BYOK) |
+| File Index | SQLite (local) |
+| Key Storage | OS Keychain via Tauri `keyring` |
+
+---
+
+## AI Setup
+
+Newtron works out of the box with local AI. To connect cloud models, add your own API key in settings — it takes 30 seconds and is stored exclusively in your system keychain.
+
+| Model | Provider | Free? |
+|---|---|---|
+| Llama 3 / Mistral | Ollama (local) | ✅ Always free |
+| Gemini 1.5 Flash | Google AI Studio | ✅ 1,500 req/day |
+| Gemini 1.5 Pro | Google AI Studio | ✅ 50 req/day |
+| GPT-4o | OpenAI (BYOK) | Your key |
+| Claude 3.5 | Anthropic (BYOK) | Your key |
+
+---
+
+## Roadmap to Alpha
+
+- [ ] Rust-based global shortcut listener (`Alt + N`)
+- [ ] File indexer + SQLite search engine
+- [ ] Google search result rendering in dropdown
+- [ ] Ollama local AI integration
+- [ ] BYOK key manager (OS keychain)
+- [ ] Cloud AI routing (`@model` syntax)
+- [ ] Glassmorphism UI kit + animations
+- [ ] App launcher (OS-level)
+- [ ] Public Alpha Release
+
+---
+
+## Current Status
+
+> 🏗️ **Stealth Development** — Core engine is being stabilized before the first alpha. No public binaries yet.
+
+Newtron is a closed-contribution project while we finalize the architectural foundation. An open-source call to action is coming with the alpha release.
+
+---
+
+## Privacy & Security
+
+- **Local stays local.** File indexing never leaves your machine.
+- **Your keys, your control.** API keys are stored in your OS native keychain — we never see them.
+- **No middleman.** Queries go directly from your machine to the AI provider.
+- **Offline capable.** Local AI mode works with zero internet connection.
+
+---
+
+<div align="center">
+
+**Newtron — Stop switching tabs. Start thinking faster.**
+
+</div>
