@@ -25,6 +25,35 @@ Built with **Rust** for performance and **React + TypeScript** for a fluid, mode
 
 ---
 
+## Getting Started
+
+### Prerequisites
+
+Make sure you have these installed before running Newtron:
+
+- [Node.js (LTS)](https://nodejs.org)
+- [Rust](https://rustup.rs)
+
+### Running Newtron
+
+1. Clone the repository
+   ```bash
+   git clone https://github.com/b4d1rr/Newtron.git
+   cd Newtron
+   ```
+
+2. Run the setup script by double-clicking `setup.bat` or running it in your terminal:
+   ```bash
+   ./setup.bat
+   ```
+   The script will automatically verify Node and Rust, install the Tauri CLI if missing, sync all dependencies, and launch Newtron in dev mode.
+
+3. Press `Alt + N` — Newtron appears instantly.
+
+> ⚠️ If setup.bat errors on Node or Rust, install them from the links above and rerun.
+
+---
+
 ## Features
 
 ### 🧠 AI Command Bar
@@ -90,7 +119,7 @@ One input. Every result type. You choose what to act on.
 
 ## AI Setup
 
-Newtron works out of the box with local AI. To connect cloud models, add your own API key in settings — it takes 30 seconds and is stored exclusively in your system keychain.
+Newtron works out of the box with local AI. To connect cloud models, add your own API key in settings — it takes 30 seconds and is stored exclusively in your system keychain. No accounts. No login. No middleman.
 
 | Model | Provider | Free? |
 |---|---|---|
@@ -128,6 +157,7 @@ Newtron is a closed-contribution project while we finalize the architectural fou
 
 - **Local stays local.** File indexing never leaves your machine.
 - **Your keys, your control.** API keys are stored in your OS native keychain — we never see them.
+- **No accounts.** Newtron uses a BYOK model — no login, no sessions, no tracking.
 - **No middleman.** Queries go directly from your machine to the AI provider.
 - **Offline capable.** Local AI mode works with zero internet connection.
 
