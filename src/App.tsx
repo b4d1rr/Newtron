@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import "./App.css";
 
 const appWindow = getCurrentWebviewWindow();
@@ -17,6 +18,18 @@ function App() {
   const [systemResults, setSystemResults] = useState<SystemItem[]>([]);
   const [activeTab, setActiveTab] = useState("ai");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleResultClick = async (item: SystemItem) => {
+    if (item.kind === "Web") {
+      const query = input.trim();
+      const isUrl = /^https?:\/\/\S+$/i.test(query) || /^[\w-]+(\.[\w-]+)+(:\d+)?(\/\S*)?$/.test(query);
+      const url = isUrl
+        ? (/^https?:\/\//i.test(query) ? query : `https://${query}`)
+        : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      await openUrl(url);
+      appWindow.hide();
+    }
+  };
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
@@ -35,6 +48,21 @@ function App() {
       setAiResponse("");
     }
   };
+
+  useEffect(() => {
+    const unlisten = appWindow.onFocusChanged(({ payload: focused }) => {
+      if (focused) {
+        inputRef.current?.focus();
+      } else {
+        setInput("");
+        setAiResponse("");
+        setSystemResults([]);
+      }
+    });
+    return () => {
+      unlisten.then((f) => f());
+    };
+  }, []);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -103,7 +131,7 @@ function App() {
               <div className="system-results-block">
                 <div className="section-title">System Results</div>
                 {systemResults.map((item, idx) => (
-                  <div key={idx} className="system-row">
+                  <div key={idx} className="system-row" onClick={() => handleResultClick(item)}>
                     <div className="item-icon-box">{item.kind[0]}</div>
                     <div className="item-details">
                       <div className="item-name">{item.name}</div>

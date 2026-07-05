@@ -27,6 +27,7 @@ fn get_system_results(query: String) -> Vec<SystemItem> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![ask_newtron, get_system_results])
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::Focused(focused) = event {
