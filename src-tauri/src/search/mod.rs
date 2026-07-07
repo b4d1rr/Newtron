@@ -5,8 +5,10 @@
 //! keystroke. The frontend only ever sees `Vec<SearchResult>` — it has no
 //! knowledge of which provider produced them.
 
+mod bing;
 mod brave;
 mod duckduckgo;
+mod google;
 
 use std::time::Duration;
 
@@ -61,12 +63,15 @@ impl SearchEngine {
             .build()
             .expect("failed to build http client");
 
-        // Priority order. Brave runs first when an API key is configured;
-        // DuckDuckGo is the keyless default. Google is intentionally absent:
-        // it has no keyless endpoint that permits automated querying.
+        // Priority order. Google (official Custom Search API) runs first when
+        // its key is configured, then Brave (API key), then the keyless
+        // fallbacks: DuckDuckGo lite and finally the Bing HTML page. Keyed
+        // providers silently skip themselves when unconfigured.
         let providers: Vec<Box<dyn SearchProvider>> = vec![
+            Box::new(google::GoogleProvider::from_env()),
             Box::new(brave::BraveProvider::from_env()),
             Box::new(duckduckgo::DuckDuckGoProvider),
+            Box::new(bing::BingProvider),
         ];
 
         Self {

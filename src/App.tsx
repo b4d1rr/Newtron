@@ -20,7 +20,9 @@ import { WebResults } from "./components/WebResults";
 const appWindow = getCurrentWebviewWindow();
 
 const SUGGEST_DEBOUNCE_MS = 120;
-const SEARCH_DEBOUNCE_MS = 450;
+// Long enough that we only search settled queries: rapid-fire prefix
+// searches ("lio", "lione", ...) trip provider bot detection.
+const SEARCH_DEBOUNCE_MS = 700;
 const MIN_SEARCH_CHARS = 3;
 const MAX_SUGGESTIONS = 5;
 

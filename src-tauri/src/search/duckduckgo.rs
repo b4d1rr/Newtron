@@ -1,11 +1,17 @@
-//! DuckDuckGo provider backed by the keyless `html.duckduckgo.com` endpoint.
+//! DuckDuckGo provider backed by the keyless `lite.duckduckgo.com` endpoint.
+//!
+//! The lite page is a plain HTML table designed for text browsers — cheaper
+//! to fetch and parse than the full HTML endpoint. DDG rate-limits automated
+//! traffic; when it serves a challenge page instead of results we surface an
+//! error (not an empty result set) so the engine's failure cache backs off
+//! and the next provider takes over.
 
 use async_trait::async_trait;
 use scraper::{Html, Selector};
 
 use super::{favicon_for, host_of, SearchProvider, SearchResult};
 
-const ENDPOINT: &str = "https://html.duckduckgo.com/html/";
+const ENDPOINT: &str = "https://lite.duckduckgo.com/lite/";
 const MAX_RESULTS: usize = 8;
 
 pub struct DuckDuckGoProvider;
@@ -29,8 +35,10 @@ impl SearchProvider for DuckDuckGoProvider {
             .await
             .map_err(|e| e.to_string())?;
 
-        // Parsing happens on a blocking thread: `Html` is cheap for one page
-        // but this keeps the async runtime free on principle.
+        if body.contains("anomaly") || body.contains("challenge") {
+            return Err("rate-limited (bot challenge)".into());
+        }
+
         tauri::async_runtime::spawn_blocking(move || parse(&body))
             .await
             .map_err(|e| e.to_string())
@@ -38,18 +46,17 @@ impl SearchProvider for DuckDuckGoProvider {
 }
 
 fn parse(body: &str) -> Vec<SearchResult> {
-    // Selectors are static strings; unwrap is safe.
-    let result_sel = Selector::parse("div.result__body").unwrap();
-    let title_sel = Selector::parse("h2.result__title a.result__a").unwrap();
-    let snippet_sel = Selector::parse("a.result__snippet, div.result__snippet").unwrap();
+    let link_sel = Selector::parse("a.result-link").unwrap();
+    let snippet_sel = Selector::parse("td.result-snippet").unwrap();
 
     let doc = Html::parse_document(body);
-    let mut out = Vec::new();
+    let snippets: Vec<String> = doc
+        .select(&snippet_sel)
+        .map(|s| s.text().collect::<String>().trim().to_string())
+        .collect();
 
-    for item in doc.select(&result_sel).take(MAX_RESULTS) {
-        let Some(link) = item.select(&title_sel).next() else {
-            continue;
-        };
+    let mut out = Vec::new();
+    for (i, link) in doc.select(&link_sel).take(MAX_RESULTS).enumerate() {
         let title = link.text().collect::<String>().trim().to_string();
         let Some(url) = link.value().attr("href").and_then(decode_redirect) else {
             continue;
@@ -57,16 +64,10 @@ fn parse(body: &str) -> Vec<SearchResult> {
         if title.is_empty() {
             continue;
         }
-        let snippet = item
-            .select(&snippet_sel)
-            .next()
-            .map(|s| s.text().collect::<String>().trim().to_string())
-            .unwrap_or_default();
         let favicon = host_of(&url).map(|h| favicon_for(&h));
-
         out.push(SearchResult {
             title,
-            snippet,
+            snippet: snippets.get(i).cloned().unwrap_or_default(),
             url,
             favicon,
             source: "DuckDuckGo".to_string(),
@@ -75,7 +76,7 @@ fn parse(body: &str) -> Vec<SearchResult> {
     out
 }
 
-/// Result links point at DDG's redirect (`//duckduckgo.com/l/?uddg=<real-url>`);
+/// Result links may point at DDG's redirect (`//duckduckgo.com/l/?uddg=<url>`);
 /// unwrap them so we store and open the destination directly.
 fn decode_redirect(href: &str) -> Option<String> {
     if let Some(idx) = href.find("uddg=") {
@@ -83,7 +84,6 @@ fn decode_redirect(href: &str) -> Option<String> {
         let encoded = encoded.split('&').next()?;
         return urlencoding::decode(encoded).ok().map(|c| c.into_owned());
     }
-    // Some result types link directly.
     if href.starts_with("http") {
         return Some(href.to_string());
     }

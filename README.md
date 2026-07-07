@@ -80,7 +80,7 @@ Connect your own API keys for OpenAI, Anthropic, or Gemini — stored securely i
 No account required to get started. Newtron ships with a built-in local AI (via Ollama) that works instantly, offline, and for free.
 
 ### 🌐 Embedded Web Search
-Type a query and see real web results — title, snippet, favicon — rendered directly inside Newtron. No browser switch. No context loss. The browser only opens when you pick a result (or press `Shift+Enter` to search in your browser explicitly). Behind the scenes a provider chain (Brave API when configured, DuckDuckGo by default) with automatic fallback and result caching keeps it fast.
+Type a query and see real web results — title, snippet, favicon — rendered directly inside Newtron. No browser switch. No context loss. The browser only opens when you pick a result (or press `Shift+Enter` to search in your browser explicitly). Behind the scenes a provider chain — Google Custom Search API (add a free key), Brave API (key), DuckDuckGo, Bing — with automatic fallback and result caching keeps it fast and resilient.
 
 ### ⚡ Intelligent URL Autocomplete
 Type `git` and Newtron completes `github.com` as inline ghost text — press `Tab` to accept, `Enter` to go. Suggestions come from an adaptive SQLite index seeded with 250+ popular sites, enriched by your imported browser history (Chrome, Edge, Brave, Firefox, Arc — read-only, never modified), and re-ranked by what you actually open. The more you use it, the better it gets.
@@ -124,7 +124,7 @@ One input. Every result type. You choose what to act on.
 |---|---|
 | Core | Rust (Tauri) |
 | Frontend | React + TypeScript |
-| Web Search | Provider chain: Brave Search API (BYOK) → DuckDuckGo |
+| Web Search | Provider chain: Google Custom Search API (BYOK) → Brave API (BYOK) → DuckDuckGo → Bing |
 | URL Index | SQLite (local) — curated seed + browser history + visit learning |
 | Local AI | Ollama |
 | Cloud AI | OpenAI / Anthropic / Gemini (BYOK) |
