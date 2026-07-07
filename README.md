@@ -9,7 +9,8 @@
 ![Status](https://img.shields.io/badge/status-under%20active%20development-yellow?style=flat-square)
 ![Stack](https://img.shields.io/badge/stack-Rust%20%2B%20TypeScript-blue?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
-![Last Updated](https://img.shields.io/badge/updated-April%202026-lightgrey?style=flat-square)
+![Last Updated](https://img.shields.io/badge/updated-July%202026-lightgrey?style=flat-square)
+[![Release](https://img.shields.io/badge/release-v0.1.0--alpha-orange?style=flat-square)](https://github.com/b4d1rr/Newtron/releases/tag/v0.1.0-alpha)
 
 </div>
 
@@ -27,7 +28,18 @@ Built with **Rust** for performance and **React + TypeScript** for a fluid, mode
 
 ## Getting Started
 
-### Prerequisites
+### Quick Install (no build required)
+
+Grab the latest build from the [releases page](https://github.com/b4d1rr/Newtron/releases):
+
+- **Newtron_x64-setup.exe** — recommended installer
+- **newtron.exe** — portable, just run it
+
+Launch Newtron, then press `Alt + N` anywhere to summon or dismiss the bar. Launching it again while it's running simply brings the bar back up.
+
+### Building from Source
+
+#### Prerequisites
 
 Make sure you have these installed before running Newtron:
 
@@ -133,8 +145,10 @@ Newtron works out of the box with local AI. To connect cloud models, add your ow
 
 ## Roadmap to Alpha
 
-- [ ] Rust-based global shortcut listener (`Alt + N`)
-- [ ] File indexer + SQLite search engine
+- [x] Rust-based global shortcut listener (`Alt + N`)
+- [x] Web search from the bar (opens your browser; direct navigation for URL-like queries such as `youtube.com`)
+- [x] Single-instance guard + desktop launch support
+- [ ] File indexer + SQLite search engine (current file/app results are placeholder data)
 - [ ] Google search result rendering in dropdown
 - [ ] Ollama local AI integration
 - [ ] BYOK key manager (OS keychain)
@@ -147,9 +161,9 @@ Newtron works out of the box with local AI. To connect cloud models, add your ow
 
 ## Current Status
 
-> 🏗️ **Stealth Development** — Core engine is being stabilized before the first alpha. No public binaries yet.
+> 🏗️ **Early Alpha** — [v0.1.0-alpha](https://github.com/b4d1rr/Newtron/releases/tag/v0.1.0-alpha) is available to download. The shell (global shortcut, command bar UI, web search) works; file search and AI responses are still placeholder stubs while the core engine is built out.
 
-Newtron is a closed-contribution project while we finalize the architectural foundation. An open-source call to action is coming with the alpha release.
+Newtron is a closed-contribution project while we finalize the architectural foundation. An open-source call to action is coming with a later release.
 
 ---
 
