@@ -10,7 +10,7 @@
 ![Stack](https://img.shields.io/badge/stack-Rust%20%2B%20TypeScript-blue?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Last Updated](https://img.shields.io/badge/updated-July%202026-lightgrey?style=flat-square)
-[![Release](https://img.shields.io/badge/release-v0.1.0--alpha-orange?style=flat-square)](https://github.com/b4d1rr/Newtron/releases/tag/v0.1.0-alpha)
+[![Release](https://img.shields.io/badge/release-v0.2.0--alpha-orange?style=flat-square)](https://github.com/b4d1rr/Newtron/releases/tag/v0.2.0-alpha)
 
 </div>
 
@@ -167,7 +167,7 @@ Newtron works out of the box with local AI. To connect cloud models, add your ow
 
 ## Current Status
 
-> 🏗️ **Early Alpha** — [v0.1.0-alpha](https://github.com/b4d1rr/Newtron/releases/tag/v0.1.0-alpha) is available to download. The shell (global shortcut, command bar UI, web search) works; file search and AI responses are still placeholder stubs while the core engine is built out.
+> 🏗️ **Early Alpha** — [v0.2.0-alpha](https://github.com/b4d1rr/Newtron/releases/tag/v0.2.0-alpha) is available to download. The shell (global shortcut, command bar UI), embedded web search, and adaptive URL autocomplete all work; file search and AI responses are still placeholder stubs while the core engine is built out.
 
 Newtron is a closed-contribution project while we finalize the architectural foundation. An open-source call to action is coming with a later release.
 
