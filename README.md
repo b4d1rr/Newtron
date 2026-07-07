@@ -79,8 +79,11 @@ Connect your own API keys for OpenAI, Anthropic, or Gemini — stored securely i
 
 No account required to get started. Newtron ships with a built-in local AI (via Ollama) that works instantly, offline, and for free.
 
-### 🌐 Web Search in the Dropdown
-Type a query, see Google results rendered directly inside Newtron. No browser switch. No context loss.
+### 🌐 Embedded Web Search
+Type a query and see real web results — title, snippet, favicon — rendered directly inside Newtron. No browser switch. No context loss. The browser only opens when you pick a result (or press `Shift+Enter` to search in your browser explicitly). Behind the scenes a provider chain (Brave API when configured, DuckDuckGo by default) with automatic fallback and result caching keeps it fast.
+
+### ⚡ Intelligent URL Autocomplete
+Type `git` and Newtron completes `github.com` as inline ghost text — press `Tab` to accept, `Enter` to go. Suggestions come from an adaptive SQLite index seeded with 250+ popular sites, enriched by your imported browser history (Chrome, Edge, Brave, Firefox, Arc — read-only, never modified), and re-ranked by what you actually open. The more you use it, the better it gets.
 
 ### 📁 Lightning-Fast File Search
 Rust-powered local file indexer backed by SQLite. Finds anything on your machine in milliseconds — files, folders, Git repos, system settings.
@@ -121,7 +124,8 @@ One input. Every result type. You choose what to act on.
 |---|---|
 | Core | Rust (Tauri) |
 | Frontend | React + TypeScript |
-| Styling | TailwindCSS + Framer Motion |
+| Web Search | Provider chain: Brave Search API (BYOK) → DuckDuckGo |
+| URL Index | SQLite (local) — curated seed + browser history + visit learning |
 | Local AI | Ollama |
 | Cloud AI | OpenAI / Anthropic / Gemini (BYOK) |
 | File Index | SQLite (local) |
@@ -146,10 +150,12 @@ Newtron works out of the box with local AI. To connect cloud models, add your ow
 ## Roadmap to Alpha
 
 - [x] Rust-based global shortcut listener (`Alt + N`)
-- [x] Web search from the bar (opens your browser; direct navigation for URL-like queries such as `youtube.com`)
 - [x] Single-instance guard + desktop launch support
+- [x] Embedded web search results in the dropdown (provider chain with fallback + caching)
+- [x] Intelligent URL autocomplete with inline ghost text (`Tab` to accept)
+- [x] Adaptive SQLite URL index — built-in site catalog + browser history import + visit learning
+- [x] Keyboard-first navigation (`↑↓` navigate, `Enter` open, `Shift+Enter` browser, `Esc` close, `Ctrl+L` focus)
 - [ ] File indexer + SQLite search engine (current file/app results are placeholder data)
-- [ ] Google search result rendering in dropdown
 - [ ] Ollama local AI integration
 - [ ] BYOK key manager (OS keychain)
 - [ ] Cloud AI routing (`@model` syntax)
