@@ -1,11 +1,14 @@
 mod cache;
 mod commands;
 mod index;
+mod indexer;
+mod router;
 mod search;
 
 use tauri::Manager;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
+use index::local::LocalIndex;
 use index::UrlIndex;
 use search::SearchEngine;
 
@@ -14,39 +17,18 @@ const HISTORY_IMPORT_INTERVAL_SECS: i64 = 86_400;
 
 pub struct AppState {
     pub index: UrlIndex,
+    pub local_index: LocalIndex,
     pub engine: SearchEngine,
 }
 
-#[derive(serde::Serialize)]
-struct SystemItem {
-    name: String,
-    kind: String,
-    path: String,
-}
-
-/// Placeholder file/app results until the real file indexer lands.
-#[tauri::command]
-fn get_system_results(query: String) -> Vec<SystemItem> {
-    if query.is_empty() {
-        return vec![];
-    }
-    vec![
-        SystemItem {
-            name: format!("{}.exe", query),
-            kind: "App".into(),
-            path: "C:/Program Files/".into(),
-        },
-        SystemItem {
-            name: format!("{}_data.xlsx", query),
-            kind: "File".into(),
-            path: "C:/Users/Bader/Documents/".into(),
-        },
-    ]
-}
-
+/// Ask-AI mode placeholder — Mode 2 in the frontend. Will become a real
+/// model call once the AI layer lands (see `versionPlan.md`).
 #[tauri::command]
 fn ask_newtron(message: String) -> String {
-    format!("Newtron AI: Analysis of '{}' is complete. I've cross-referenced your system logs and indexed the relevant metadata for your query.", message)
+    format!(
+        "Newtron AI is a placeholder for now. You asked: \"{}\" — real model integration is next on the roadmap.",
+        message
+    )
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -61,8 +43,13 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             ask_newtron,
-            get_system_results,
             commands::web_search,
+            commands::search_all,
+            commands::open_web_search,
+            commands::open_local_item,
+            commands::add_indexed_folder,
+            commands::remove_indexed_folder,
+            commands::list_indexed_folders,
             commands::url_suggest,
             commands::record_visit,
             commands::add_alias,
@@ -97,13 +84,16 @@ pub fn run() {
             let shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyN);
             app.handle().global_shortcut().register(shortcut)?;
 
-            // URL index lives in the per-user app data directory.
+            // Both indexes live in the per-user app data directory, sharing
+            // one SQLite file (`UrlIndex` and `LocalIndex` each hold their
+            // own `Connection` to it).
             let db_path = app
                 .path()
                 .app_data_dir()
                 .map_err(|e| format!("no app data dir: {e}"))?
                 .join("newtron.db");
             let index = UrlIndex::open(&db_path).map_err(|e| format!("failed to open url index: {e}"))?;
+            let local_index = LocalIndex::open(&db_path).map_err(|e| format!("failed to open local index: {e}"))?;
 
             // Background browser-history import; never blocks startup and
             // silently skips anything unreadable.
@@ -119,8 +109,14 @@ pub fn run() {
                 });
             }
 
+            // Background file/app indexer: seeds Desktop/Documents/Downloads/
+            // Pictures/Videos on first run, full-scans, then watches for
+            // changes. Never blocks the window from appearing.
+            indexer::spawn(local_index.clone());
+
             app.manage(AppState {
                 index,
+                local_index,
                 engine: SearchEngine::new(),
             });
             Ok(())

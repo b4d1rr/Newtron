@@ -6,18 +6,45 @@
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
-import type { SearchResult, Suggestion, SystemItem } from "./types";
+import type { RouteResult, SearchResult, Suggestion } from "./types";
 
+/** Mode 1: local files + apps + go-to suggestions + web-search affordance,
+ *  merged and ranked server-side (see `router.rs`). */
+export function searchAll(query: string): Promise<RouteResult> {
+  return invoke<RouteResult>("search_all", { query });
+}
+
+/** WebSearch::DefaultBrowserFallback — hands the query to the OS default
+ *  browser instead of fetching results in-process. */
+export function openWebSearch(query: string): Promise<void> {
+  return invoke("open_web_search", { query });
+}
+
+/** Open a locally-indexed file or app with the OS default handler. */
+export function openLocalItem(path: string, kind: "app" | "file"): Promise<void> {
+  return invoke("open_local_item", { path, kind });
+}
+
+export function addIndexedFolder(path: string): Promise<void> {
+  return invoke("add_indexed_folder", { path });
+}
+
+export function removeIndexedFolder(path: string): Promise<void> {
+  return invoke("remove_indexed_folder", { path });
+}
+
+export function listIndexedFolders(): Promise<string[]> {
+  return invoke<string[]>("list_indexed_folders");
+}
+
+/** Embedded provider-chain web search (future `APIProvider` path) — not
+ *  called by the default UI flow; kept reachable for when it's re-enabled. */
 export function webSearch(query: string): Promise<SearchResult[]> {
   return invoke<SearchResult[]>("web_search", { query });
 }
 
 export function urlSuggest(query: string, limit = 6): Promise<Suggestion[]> {
   return invoke<Suggestion[]>("url_suggest", { query, limit });
-}
-
-export function getSystemResults(query: string): Promise<SystemItem[]> {
-  return invoke<SystemItem[]>("get_system_results", { query });
 }
 
 export function askNewtron(message: string): Promise<string> {
@@ -31,11 +58,6 @@ export function askNewtron(message: string): Promise<string> {
 export async function openExternal(url: string, title?: string): Promise<void> {
   invoke("record_visit", { url, title: title ?? null }).catch(() => {});
   await openUrl(url);
-}
-
-/** Build a search-engine URL for "open in browser" fallbacks. */
-export function browserSearchUrl(query: string): string {
-  return `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
 }
 
 /** True when the text already looks like a URL or bare domain. */

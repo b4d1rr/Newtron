@@ -1,10 +1,20 @@
-//! Web search: provider abstraction with fallback chain and result caching.
+//! WebSearch module (SearchManager architecture: `WebSearch`).
 //!
-//! Providers are attempted in priority order; a provider that errors is
-//! skipped for `FAILURE_TTL` so a dead endpoint never adds latency to every
-//! keystroke. The frontend only ever sees `Vec<SearchResult>` — it has no
-//! knowledge of which provider produced them.
+//! Two backends live here:
+//!   - `browser_fallback::DefaultBrowserFallback` — the active backend.
+//!     Hands the query straight to the OS default browser. See its module
+//!     docs. This is what `commands::open_web_search` calls.
+//!   - `SearchEngine` (this file) + `bing`/`brave`/`duckduckgo`/`google` —
+//!     the future `APIProvider` backend: an in-process provider chain with
+//!     fallback and result caching, still fully functional and reachable
+//!     via `commands::web_search`, but not wired into the default UI flow
+//!     while web search stays intentionally simple.
+//!
+//! Providers below are attempted in priority order; a provider that errors
+//! is skipped for `FAILURE_TTL` so a dead endpoint never adds latency to
+//! every keystroke.
 
+pub mod browser_fallback;
 mod bing;
 mod brave;
 mod duckduckgo;

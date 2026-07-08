@@ -2,136 +2,95 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "./App.css";
 
-import {
-  askNewtron,
-  browserSearchUrl,
-  getSystemResults,
-  looksLikeUrl,
-  openExternal,
-  toUrl,
-  urlSuggest,
-  webSearch,
-} from "./lib/api";
-import type { SearchResult, Suggestion, SystemItem, WebSearchStatus } from "./lib/types";
+import { askNewtron, looksLikeUrl, openExternal, openLocalItem, openWebSearch, searchAll, toUrl } from "./lib/api";
+import type { GoToRouteItem, Mode, RouteItem, RouteResult } from "./lib/types";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import { SuggestionRow } from "./components/SuggestionRow";
-import { WebResults } from "./components/WebResults";
+import { LocalResultRow } from "./components/LocalResultRow";
+import { WebSearchRow } from "./components/WebSearchRow";
 
 const appWindow = getCurrentWebviewWindow();
 
-const SUGGEST_DEBOUNCE_MS = 120;
-// Long enough that we only search settled queries: rapid-fire prefix
-// searches ("lio", "lione", ...) trip provider bot detection.
-const SEARCH_DEBOUNCE_MS = 700;
-const MIN_SEARCH_CHARS = 3;
-const MAX_SUGGESTIONS = 5;
+// Every backend query here is a local SQLite lookup (files/apps/URL index) —
+// no network round-trip, so a short debounce is purely about not re-querying
+// on every single keystroke while typing fast.
+const SEARCH_DEBOUNCE_MS = 90;
 
-type Tab = "files" | "ai" | "web";
+const EMPTY_RESULT: RouteResult = { items: [] };
 
 function App() {
   const [input, setInput] = useState("");
-  const [activeTab, setActiveTab] = useState<Tab>("web");
+  const [mode, setMode] = useState<Mode>("search");
   const [aiResponse, setAiResponse] = useState("");
-  const [systemResults, setSystemResults] = useState<SystemItem[]>([]);
-
-  // Web tab state
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [webResults, setWebResults] = useState<SearchResult[]>([]);
-  const [webStatus, setWebStatus] = useState<WebSearchStatus>("idle");
-  const [webError, setWebError] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [routeResult, setRouteResult] = useState<RouteResult>(EMPTY_RESULT);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  // Bumped on every window focus so the entrance animation can replay by
+  // remounting `.main-container` (see key={animKey} below).
+  const [animKey, setAnimKey] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  // Monotonic tokens discard stale async responses (fast typing races).
-  const suggestToken = useRef(0);
   const searchToken = useRef(0);
-
-  const debouncedSuggestInput = useDebouncedValue(input, SUGGEST_DEBOUNCE_MS);
-  const debouncedSearchInput = useDebouncedValue(input, SEARCH_DEBOUNCE_MS);
+  const debouncedInput = useDebouncedValue(input, SEARCH_DEBOUNCE_MS);
 
   const resetAll = useCallback(() => {
     setInput("");
     setAiResponse("");
-    setSystemResults([]);
-    setSuggestions([]);
-    setWebResults([]);
-    setWebStatus("idle");
-    setWebError(null);
+    setRouteResult(EMPTY_RESULT);
     setSelectedIndex(-1);
   }, []);
 
-  /** Ghost-text completion: remainder of the top suggestion's domain. */
+  const items = routeResult.items;
+
+  /** Ghost-text completion: remainder of the top "go to" suggestion's domain. */
+  const topGoTo = useMemo(() => items.find((i): i is GoToRouteItem => i.kind === "go_to"), [items]);
   const ghostRest = useMemo(() => {
-    if (activeTab !== "web" || !input.trim() || suggestions.length === 0) return "";
+    if (mode !== "search" || !input.trim() || !topGoTo) return "";
     const typed = input.trim().toLowerCase();
-    const top = suggestions[0].domain.toLowerCase();
+    const top = topGoTo.domain.toLowerCase();
     const bare = top.startsWith("www.") ? top.slice(4) : top;
     if (bare.startsWith(typed) && bare.length > typed.length) return bare.slice(typed.length);
     return "";
-  }, [input, suggestions, activeTab]);
+  }, [input, topGoTo, mode]);
 
-  /** Combined keyboard-navigable list: suggestions first, then web results. */
-  const navLength = suggestions.length + webResults.length;
-
-  const runWebSearch = useCallback(async (query: string) => {
-    const q = query.trim();
-    if (!q) return;
-    const token = ++searchToken.current;
-    setWebStatus("loading");
-    setWebError(null);
-    try {
-      const results = await webSearch(q);
-      if (token !== searchToken.current) return;
-      setWebResults(results);
-      setWebStatus("done");
-    } catch (e) {
-      if (token !== searchToken.current) return;
-      setWebResults([]);
-      setWebStatus("error");
-      setWebError(String(e));
-    }
-  }, []);
-
-  // Live URL suggestions while typing in the web tab.
+  // Mode 1: local files + apps + go-to suggestions + web-search row, all in
+  // one ranked backend call (see router.rs).
   useEffect(() => {
-    if (activeTab !== "web") return;
-    const q = debouncedSuggestInput.trim();
-    const token = ++suggestToken.current;
-    if (!q) {
-      setSuggestions([]);
+    if (mode !== "search") return;
+    const q = debouncedInput.trim();
+    const token = ++searchToken.current;
+    if (!q || looksLikeUrl(q)) {
+      setRouteResult(EMPTY_RESULT);
       return;
     }
-    urlSuggest(q, MAX_SUGGESTIONS)
-      .then((s) => {
-        if (token === suggestToken.current) setSuggestions(s);
+    searchAll(q)
+      .then((r) => {
+        if (token === searchToken.current) setRouteResult(r);
       })
-      .catch(() => {});
-  }, [debouncedSuggestInput, activeTab]);
+      .catch(() => {
+        if (token === searchToken.current) setRouteResult(EMPTY_RESULT);
+      });
+  }, [debouncedInput, mode]);
 
-  // Debounced auto web search.
-  useEffect(() => {
-    if (activeTab !== "web") return;
-    const q = debouncedSearchInput.trim();
-    if (q.length < MIN_SEARCH_CHARS || looksLikeUrl(q)) return;
-    runWebSearch(q);
-  }, [debouncedSearchInput, activeTab, runWebSearch]);
-
-  // Selection resets whenever the underlying list changes.
   useEffect(() => {
     setSelectedIndex(-1);
-  }, [suggestions, webResults]);
+  }, [items]);
 
-  const openSuggestion = useCallback((s: Suggestion) => {
-    openExternal(s.url, s.title ?? undefined);
+  const openItem = useCallback((item: RouteItem) => {
+    if (item.kind === "app") {
+      openLocalItem(item.path, "app");
+    } else if (item.kind === "file") {
+      openLocalItem(item.full_path, "file");
+    } else if (item.kind === "go_to") {
+      openExternal(item.url, item.title ?? undefined);
+    } else {
+      openWebSearch(item.query);
+    }
     appWindow.hide();
   }, []);
 
-  const openResult = useCallback((r: SearchResult) => {
-    openExternal(r.url, r.title);
-    appWindow.hide();
-  }, []);
-
-  /** Enter with nothing selected: URL goes straight to browser, text searches. */
+  /** Enter with nothing selected: URL goes straight to browser, ghost-text
+   *  completion is accepted, otherwise fall through to a web search. */
   const handleEnterDefault = useCallback(() => {
     const q = input.trim();
     if (!q) return;
@@ -140,33 +99,35 @@ function App() {
       appWindow.hide();
       return;
     }
-    runWebSearch(q);
-  }, [input, runWebSearch]);
+    if (ghostRest) {
+      openExternal(toUrl(q + ghostRest));
+      appWindow.hide();
+      return;
+    }
+    openWebSearch(q);
+    appWindow.hide();
+  }, [input, ghostRest]);
 
-  const handleFilesAndAi = useCallback(
-    async (query: string) => {
-      if (!query.trim()) {
-        setAiResponse("");
-        setSystemResults([]);
-        return;
-      }
-      if (activeTab === "ai") {
-        const res = await askNewtron(query);
-        setAiResponse(res);
-        setSystemResults([]);
-      } else if (activeTab === "files") {
-        const results = await getSystemResults(query);
-        setSystemResults(results);
-        setAiResponse("");
-      }
-    },
-    [activeTab],
-  );
+  const askAi = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setAiResponse("");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const res = await askNewtron(query);
+      setAiResponse(res);
+    } finally {
+      setAiLoading(false);
+    }
+  }, []);
 
-  // Reset to a fresh prompt whenever the window hides; refocus on show.
+  // Reset to a fresh prompt whenever the window hides; refocus + replay the
+  // entrance animation on show.
   useEffect(() => {
     const unlisten = appWindow.onFocusChanged(({ payload: focused }) => {
       if (focused) {
+        setAnimKey((k) => k + 1);
         inputRef.current?.focus();
       } else {
         resetAll();
@@ -181,6 +142,14 @@ function App() {
   useEffect(() => {
     inputRef.current?.focus();
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd+1 and +2 switch modes without hijacking digits typed into
+      // the query itself.
+      if ((e.ctrlKey || e.metaKey) && (e.key === "1" || e.key === "2")) {
+        e.preventDefault();
+        setMode(e.key === "1" ? "search" : "ai");
+        return;
+      }
+
       // Ctrl+L: focus and select the input, like a browser address bar.
       if (e.ctrlKey && e.key.toLowerCase() === "l") {
         e.preventDefault();
@@ -191,12 +160,9 @@ function App() {
 
       if (e.key === "Escape") {
         e.preventDefault();
-        // First Esc closes the results panel, second hides the window.
-        if (webResults.length > 0 || webStatus !== "idle" || suggestions.length > 0) {
-          searchToken.current++; // cancel in-flight search
-          setWebResults([]);
-          setSuggestions([]);
-          setWebStatus("idle");
+        if (items.length > 0 || selectedIndex !== -1) {
+          searchToken.current++;
+          setRouteResult(EMPTY_RESULT);
           setSelectedIndex(-1);
         } else {
           appWindow.hide();
@@ -204,15 +170,15 @@ function App() {
         return;
       }
 
-      if (activeTab === "web") {
+      if (mode === "search") {
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          if (navLength > 0) setSelectedIndex((i) => (i + 1) % navLength);
+          if (items.length > 0) setSelectedIndex((i) => (i + 1) % items.length);
           return;
         }
         if (e.key === "ArrowUp") {
           e.preventDefault();
-          if (navLength > 0) setSelectedIndex((i) => (i <= 0 ? navLength - 1 : i - 1));
+          if (items.length > 0) setSelectedIndex((i) => (i <= 0 ? items.length - 1 : i - 1));
           return;
         }
         if (e.key === "Tab" && ghostRest) {
@@ -223,54 +189,39 @@ function App() {
         if (e.key === "Enter") {
           e.preventDefault();
           if (e.shiftKey) {
-            // Explicit "open in browser" for the raw query.
-            openExternal(browserSearchUrl(input.trim()));
-            appWindow.hide();
+            // Explicit "open in browser" for the raw query, regardless of selection.
+            if (input.trim()) {
+              openWebSearch(input.trim());
+              appWindow.hide();
+            }
             return;
           }
-          if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
-            openSuggestion(suggestions[selectedIndex]);
-          } else if (selectedIndex >= suggestions.length && selectedIndex < navLength) {
-            openResult(webResults[selectedIndex - suggestions.length]);
-          } else if (ghostRest) {
-            openExternal(toUrl(input.trim() + ghostRest));
-            appWindow.hide();
+          if (selectedIndex >= 0 && selectedIndex < items.length) {
+            openItem(items[selectedIndex]);
           } else {
             handleEnterDefault();
           }
           return;
         }
       } else if (e.key === "Enter" && !e.shiftKey) {
-        handleFilesAndAi(input);
+        askAi(input);
       }
     };
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [
-    input,
-    activeTab,
-    navLength,
-    ghostRest,
-    selectedIndex,
-    suggestions,
-    webResults,
-    webStatus,
-    openSuggestion,
-    openResult,
-    handleEnterDefault,
-    handleFilesAndAi,
-  ]);
+  }, [input, mode, items, ghostRest, selectedIndex, openItem, handleEnterDefault, askAi]);
 
-  const showPanel =
-    Boolean(aiResponse) ||
-    systemResults.length > 0 ||
-    (activeTab === "web" && (suggestions.length > 0 || webResults.length > 0 || webStatus !== "idle"));
+  const showPanel = mode === "ai" ? Boolean(aiResponse) || aiLoading : items.length > 0;
+
+  const localItems = items.filter((i): i is Extract<RouteItem, { kind: "app" | "file" }> => i.kind === "app" || i.kind === "file");
+  const goToItems = items.filter((i): i is GoToRouteItem => i.kind === "go_to");
+  const webSearchItem = items.find((i): i is Extract<RouteItem, { kind: "web_search" }> => i.kind === "web_search");
 
   return (
     <div className="wrapper">
-      <div className="main-container">
+      <div className="main-container" key={animKey}>
         <div className="search-box">
-          <span className="ai-icon">✨</span>
+          <span className="ai-icon">{mode === "ai" ? "✨" : "⌕"}</span>
           <div className="input-stack">
             {/* Ghost layer sits behind the input; the typed prefix is
                 transparent so only the completion remainder is visible. */}
@@ -284,85 +235,98 @@ function App() {
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
-                if (activeTab !== "web") handleFilesAndAi(e.target.value);
+                if (mode === "ai" && !e.target.value.trim()) setAiResponse("");
               }}
-              placeholder="Search or ask Newtron..."
+              placeholder={mode === "ai" ? "Ask Newtron anything..." : "Search files, apps, or the web..."}
               className="search-input"
               spellCheck={false}
               autoComplete="off"
             />
           </div>
-          {activeTab === "web" && ghostRest && <kbd className="key-hint tab-hint">Tab</kbd>}
-        </div>
+          {mode === "search" && ghostRest && <kbd className="key-hint tab-hint">Tab</kbd>}
 
-        <div className="options-container">
-          <button className={activeTab === "files" ? "active" : ""} onClick={() => setActiveTab("files")}>
-            1 Search Files
-          </button>
-          <button className={activeTab === "ai" ? "active" : ""} onClick={() => setActiveTab("ai")}>
-            2 Ask AI
-          </button>
-          <button
-            className={activeTab === "web" ? "active" : ""}
-            onClick={() => {
-              setActiveTab("web");
-              if (input.trim()) runWebSearch(input);
-            }}
-          >
-            3 Search Web
-          </button>
+          <div className="mode-switch" role="tablist" aria-label="Mode">
+            <div className={`mode-indicator ${mode === "ai" ? "mode-indicator-ai" : ""}`} aria-hidden="true" />
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === "search"}
+              className={mode === "search" ? "active" : ""}
+              onClick={() => setMode("search")}
+            >
+              <kbd>1</kbd> Search
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === "ai"}
+              className={mode === "ai" ? "active" : ""}
+              onClick={() => setMode("ai")}
+            >
+              <kbd>2</kbd> Ask AI
+            </button>
+          </div>
         </div>
 
         <div className={`results-wrapper ${showPanel ? "expanded" : ""}`}>
           <div className="results-inner">
             <div className="results-scroll">
-              {aiResponse && (
+              {mode === "ai" && (
                 <div className="ai-result-block">
                   <div className="section-title">Newtron AI</div>
-                  <div className="ai-content">{aiResponse}</div>
-                </div>
-              )}
-
-              {systemResults.length > 0 && (
-                <div className="system-results-block">
-                  <div className="section-title">System Results</div>
-                  {systemResults.map((item, idx) => (
-                    <div key={idx} className="system-row">
-                      <div className="item-icon-box">{item.kind[0]}</div>
-                      <div className="item-details">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-path">{item.path}</div>
-                      </div>
-                      <div className="item-tag">{item.kind}</div>
+                  {aiLoading ? (
+                    <div className="web-state">
+                      <div className="spinner" aria-label="Thinking" />
+                      <span>Thinking…</span>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="ai-content">{aiResponse}</div>
+                  )}
                 </div>
               )}
 
-              {activeTab === "web" && suggestions.length > 0 && (
+              {mode === "search" && localItems.length > 0 && (
+                <div className="suggestions-block">
+                  <div className="section-title">Files &amp; Apps</div>
+                  {localItems.map((item) => {
+                    const idx = items.indexOf(item);
+                    return (
+                      <LocalResultRow
+                        key={`${item.kind}-${item.kind === "app" ? item.path : item.full_path}`}
+                        item={item}
+                        selected={idx === selectedIndex}
+                        onOpen={() => openItem(item)}
+                        onHover={() => setSelectedIndex(idx)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+
+              {mode === "search" && goToItems.length > 0 && (
                 <div className="suggestions-block">
                   <div className="section-title">Go To</div>
-                  {suggestions.map((s, i) => (
-                    <SuggestionRow
-                      key={s.url}
-                      suggestion={s}
-                      selected={i === selectedIndex}
-                      onOpen={() => openSuggestion(s)}
-                      onHover={() => setSelectedIndex(i)}
-                    />
-                  ))}
+                  {goToItems.map((s) => {
+                    const idx = items.indexOf(s);
+                    return (
+                      <SuggestionRow
+                        key={s.url}
+                        suggestion={s}
+                        selected={idx === selectedIndex}
+                        onOpen={() => openItem(s)}
+                        onHover={() => setSelectedIndex(idx)}
+                      />
+                    );
+                  })}
                 </div>
               )}
 
-              {activeTab === "web" && (
-                <WebResults
-                  status={webStatus}
-                  results={webResults}
-                  error={webError}
-                  selectedIndex={selectedIndex - suggestions.length}
-                  onOpen={openResult}
-                  onHover={(i) => setSelectedIndex(i + suggestions.length)}
-                  onRetry={() => runWebSearch(input)}
+              {mode === "search" && webSearchItem && (
+                <WebSearchRow
+                  query={webSearchItem.query}
+                  selected={items.indexOf(webSearchItem) === selectedIndex}
+                  onOpen={() => openItem(webSearchItem)}
+                  onHover={() => setSelectedIndex(items.indexOf(webSearchItem))}
                 />
               )}
             </div>
