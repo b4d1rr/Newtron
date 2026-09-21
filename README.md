@@ -1,116 +1,139 @@
-# Newtron
+<div align="center">
 
-**A lightweight, privacy-first command bar for fast local search and local AI.**
+# ⚡ Newtron
 
-Newtron is a system-wide command bar that lives on a global keyboard shortcut. Press it from anywhere, and search your files, folders, and applications — or ask a locally-running AI model a question — without touching your mouse or leaving what you're doing.
+### Search your machine. Ask your AI. Never leave the keyboard.
 
-This is a ground-up rebuild of the project, scoped intentionally to two things done well rather than a broad feature set: **fast local search** and **local AI**.
+[![Status](https://img.shields.io/badge/status-pre--development-orange?style=flat-square)](#current-status)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20v2-24C8DB?style=flat-square)](https://tauri.app)
+[![Rust](https://img.shields.io/badge/backend-Rust-DEA584?style=flat-square)](https://www.rust-lang.org)
+[![Local AI](https://img.shields.io/badge/AI-100%25%20local-blueviolet?style=flat-square)](#2-local-ai)
 
----
-
-## Current Status
-
-🏗️ **Pre-development.** The previous prototype has been scrapped and this rebuild is starting from a clean slate. Nothing described below is implemented yet — this document describes the intended direction and serves as the working spec for the build.
-
-There is no working build, installer, or release at this stage.
+</div>
 
 ---
 
-## Key Features (Target)
+Newtron is a system-wide command bar. One global shortcut, and you can search every file, folder, and app on your machine — or hand a question to an AI running entirely on your own hardware. No cloud round-trip, no account, no tab switching.
 
-### 1. Fast Local Search
+This is a deliberate rebuild. The earlier prototype tried to do too much at once; this version does two things and does them well:
 
-Open Newtron with a global shortcut and search your computer for files, folders, and applications. The goal is search that feels instant, backed by an indexed database rather than a live filesystem scan on every keystroke.
+> 🔎 **Fast local search** &nbsp;·&nbsp; 🧠 **Local AI, via Ollama**
 
-Planned capabilities:
+---
 
-- File and folder metadata indexing
-- Incremental indexing (only re-index what changed)
-- Filename and path search with prefix, partial, and fuzzy matching
-- Relevance ranking and recently-used/opened results
+## 📍 Current Status
+
+**Pre-development.** The previous prototype has been scrapped and this rebuild starts from a clean slate — nothing in this README is implemented yet. Treat it as the working spec, not a changelog.
+
+No build, installer, or release exists at this stage.
+
+---
+
+## ✨ What It Does *(target)*
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🔎 Fast Local Search
+
+Instant, indexed search — not a live filesystem scan on every keystroke.
+
+- File & folder metadata indexing
+- Incremental indexing (only what changed)
+- Prefix, partial, and fuzzy matching
+- Relevance ranking + recently-used results
 - Full keyboard navigation
-- Opening files/folders and launching applications directly from results
+- Open files/folders or launch apps, no mouse
 
-### 2. Local AI
+</td>
+<td width="50%" valign="top">
 
-Newtron connects to a locally-running LLM through [Ollama](https://ollama.com), so prompts and model responses stay on your machine — no API keys, no accounts, no data leaving your computer.
+### 🧠 Local AI
 
-Planned capabilities:
+Runs through [Ollama](https://ollama.com) — prompts and responses never leave your machine.
 
-- Detecting a running Ollama instance and its available models
-- Selecting a model to use
-- Sending prompts and streaming responses back into the command bar
-- Cancelling an in-progress generation
-- Conversation history within a session
-- Optional local file context (asking questions about files on your machine)
+- Detects a running Ollama instance & its models
+- Model selection
+- Streaming responses in the bar
+- Cancel generation mid-stream
+- Session conversation history
+- Optional local file context
 
----
-
-## Architecture (Planned)
-
-```text
-Global Shortcut
-      ↓
-┌───────────────────────────────────────┐
-│ 🔍 Search files, apps, or ask AI...    │
-├───────────────────────────────────────┤
-│ 📄 Newtron Architecture.pdf            │
-│ 📁 Newtron                             │
-│ 💻 Visual Studio Code                  │
-│ 🤖 Ask local AI: "summarize this..."   │
-└───────────────────────────────────────┘
-```
-
-**Search path:**
-
-```text
-React/TypeScript UI → Tauri → Rust backend → local file index → SQLite / FTS5
-```
-
-**Local AI path:**
-
-```text
-React/TypeScript UI → Tauri → Rust backend → Ollama → local LLM
-```
-
-The UI itself is a minimal, keyboard-first popup — not a headline feature in its own right, just the shell the two capabilities above are delivered through.
+</td>
+</tr>
+</table>
 
 ---
 
-## Technology Stack (Target)
+## 🏗️ How It Fits Together *(planned)*
 
-| Layer         | Technology                  |
-| ------------- | ---------------------------- |
-| Shell         | Tauri v2                     |
-| Backend       | Rust                         |
-| Frontend      | React + TypeScript + Vite    |
-| Styling       | Tailwind CSS                 |
-| File index    | SQLite + SQLite FTS5         |
-| Local AI      | Ollama                       |
+```text
+                    Global Shortcut
+                          │
+                          ▼
+        ┌───────────────────────────────────┐
+        │ 🔍 Search files, apps, or ask AI…  │
+        ├───────────────────────────────────┤
+        │ 📄 Newtron Architecture.pdf        │
+        │ 📁 Newtron                         │
+        │ 💻 Visual Studio Code              │
+        │ 🤖 Ask local AI: "summarize this…" │
+        └───────────────────────────────────┘
+```
 
-This table reflects the intended stack for the rebuild. It will be corrected against the actual codebase (`package.json`, `Cargo.toml`, `tauri.conf.json`) once implementation begins.
+| Path | Flow |
+|---|---|
+| **Search** | React/TypeScript UI → Tauri → Rust backend → local file index → SQLite / FTS5 |
+| **Local AI** | React/TypeScript UI → Tauri → Rust backend → Ollama → local LLM |
+
+The command bar itself is deliberately just the shell — minimal, keyboard-first, and in service of the two capabilities above rather than a feature in its own right.
 
 ---
 
-## Roadmap
+## 🧰 Tech Stack *(target)*
 
-### Phase 1 — Foundation
+| Layer | Technology |
+|---|---|
+| Shell | Tauri v2 |
+| Backend | Rust |
+| Frontend | React + TypeScript + Vite |
+| Styling | Tailwind CSS |
+| File index | SQLite + FTS5 |
+| Local AI | Ollama |
+
+Once code exists, this table gets checked against the real `package.json` / `Cargo.toml` / `tauri.conf.json` and corrected if anything's off.
+
+---
+
+## 🗺️ Roadmap
+
+<details open>
+<summary><strong>Phase 1 — Foundation</strong></summary>
+
 - [ ] Tauri application shell
 - [ ] React + TypeScript frontend
 - [ ] Rust backend
 - [ ] Frontend ↔ Rust IPC
 - [ ] SQLite database setup
 - [ ] Global shortcut + popup command bar
+</details>
 
-### Phase 2 — File Indexing
+<details>
+<summary><strong>Phase 2 — File Indexing</strong></summary>
+
 - [ ] Directory traversal
 - [ ] File metadata extraction
 - [ ] SQLite indexing
 - [ ] Incremental indexing
 - [ ] Handling deleted/moved files
 - [ ] Indexing performance testing
+</details>
 
-### Phase 3 — Search
+<details>
+<summary><strong>Phase 3 — Search</strong></summary>
+
 - [ ] SQLite FTS5 integration
 - [ ] Prefix and partial matching
 - [ ] Fuzzy matching
@@ -118,8 +141,11 @@ This table reflects the intended stack for the rebuild. It will be corrected aga
 - [ ] Recent-result ranking
 - [ ] Keyboard navigation
 - [ ] Open files/folders, launch apps
+</details>
 
-### Phase 4 — Local AI
+<details>
+<summary><strong>Phase 4 — Local AI</strong></summary>
+
 - [ ] Ollama detection
 - [ ] Model detection and selection
 - [ ] Prompt interface
@@ -127,72 +153,79 @@ This table reflects the intended stack for the rebuild. It will be corrected aga
 - [ ] Generation cancellation
 - [ ] Conversation history
 - [ ] Local file context
+</details>
 
-### Phase 5 — Performance & Reliability
+<details>
+<summary><strong>Phase 5 — Performance & Reliability</strong></summary>
+
 - [ ] Large-filesystem testing
 - [ ] Search latency benchmarking
 - [ ] Indexing/memory/CPU optimization
 - [ ] Error and crash handling
 - [ ] Edge-case testing
+</details>
 
-### Phase 6 — Release
+<details>
+<summary><strong>Phase 6 — Release</strong></summary>
+
 - [ ] Installer
 - [ ] Application icon
 - [ ] Versioning and settings persistence
 - [ ] Documentation, screenshots, demo
 - [ ] v1.0.0 release build
+</details>
 
 ---
 
-## Target Milestones
+## 🎯 Target Milestones
 
-These are development targets, not completed work.
+*Development targets — not completed work.*
 
-**November 1, 2026 — MVP**
-- Command bar shell
-- Fast local file search
-- Application launching
-- Initial local AI integration (single model via Ollama)
-
-**December 1, 2026 — v1.0**
-- Stable, fast search
-- Reliable incremental indexing
-- Working local AI with conversation history
-- Performance optimization and error handling
-- Packaging and documentation
+| Milestone | Date | Scope |
+|---|---|---|
+| **MVP** | Nov 1, 2026 | Command bar shell · fast local search · app launching · initial local AI (single model) |
+| **v1.0** | Dec 1, 2026 | Stable search · reliable indexing · local AI with conversation history · performance tuning · packaging & docs |
 
 ---
 
-## Development
+## 🛠️ Development
 
-> Setup instructions will be filled in once the project scaffold exists.
+> Setup instructions land here once the project scaffold exists.
 
-Expected prerequisites, based on the target stack:
+Expected prerequisites:
 
 - [Node.js (LTS)](https://nodejs.org)
 - [Rust](https://rustup.rs)
-- [Ollama](https://ollama.com) (for local AI, once implemented)
+- [Ollama](https://ollama.com) — for local AI, once implemented
 
 ---
 
-## Privacy
+## 🔒 Privacy
 
-Local-first is the point of this rebuild, not an afterthought:
+Local-first isn't a checkbox here, it's the reason the project exists:
 
-- File indexing is intended to happen entirely on-device.
-- Local AI mode (via Ollama) is designed so prompts and responses never leave your machine.
-- No accounts, no telemetry, no cloud dependency for the core features.
+- File indexing happens entirely on-device.
+- Local AI mode (Ollama) means prompts and responses never leave your machine.
+- No accounts, no telemetry, no cloud dependency for either core feature.
 
-These are design commitments for the rebuild, not verified guarantees until the corresponding code exists.
-
----
-
-## Contributing
-
-This project is not yet open for contributions while the foundation is being rebuilt. That will change once there's a stable base to build on.
+These are design commitments for the rebuild — not verified guarantees until the corresponding code ships.
 
 ---
 
-## License
+## 🤝 Contributing
 
-MIT — see [LICENSE](LICENSE) for details.
+Closed to contributions while the foundation gets rebuilt. That changes once there's a stable base to build on.
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE).
+
+<div align="center">
+
+---
+
+**Newtron — one shortcut, your files, your AI.**
+
+</div>
