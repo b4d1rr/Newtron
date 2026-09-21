@@ -1,190 +1,198 @@
-<div align="center">
+# Newtron
 
-# ⚡ Newtron
+**A lightweight, privacy-first command bar for fast local search and local AI.**
 
-### Your computer's new central nervous system.
+Newtron is a system-wide command bar that lives on a global keyboard shortcut. Press it from anywhere, and search your files, folders, and applications — or ask a locally-running AI model a question — without touching your mouse or leaving what you're doing.
 
-**One keystroke. Every tool. Zero tab switching.**
-
-![Status](https://img.shields.io/badge/status-under%20active%20development-yellow?style=flat-square)
-![Stack](https://img.shields.io/badge/stack-Rust%20%2B%20TypeScript-blue?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
-![Last Updated](https://img.shields.io/badge/updated-July%202026-lightgrey?style=flat-square)
-[![Release](https://img.shields.io/badge/release-v0.2.0--alpha-orange?style=flat-square)](https://github.com/b4d1rr/Newtron/releases/tag/v0.2.0-alpha)
-
-</div>
-
----
-
-## What is Newtron?
-
-Newtron is a system-wide command bar built for people who live on their keyboard. Press `Alt + N` from anywhere on your machine and get instant access to your files, apps, the web, and every AI you use — all in one fast, lightweight interface.
-
-No Electron bloat. No subscription. No switching tabs.
-
-Built with **Rust** for performance and **React + TypeScript** for a fluid, modern UI.
-
----
-
-## Getting Started
-
-### Quick Install (no build required)
-
-Grab the latest build from the [releases page](https://github.com/b4d1rr/Newtron/releases):
-
-- **Newtron_x64-setup.exe** — recommended installer
-- **newtron.exe** — portable, just run it
-
-Launch Newtron, then press `Alt + N` anywhere to summon or dismiss the bar. Launching it again while it's running simply brings the bar back up.
-
-### Building from Source
-
-#### Prerequisites
-
-Make sure you have these installed before running Newtron:
-
-- [Node.js (LTS)](https://nodejs.org)
-- [Rust](https://rustup.rs)
-
-### Running Newtron
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/b4d1rr/Newtron.git
-   cd Newtron
-   ```
-
-2. Run the setup script by double-clicking `setup.bat` or running it in your terminal:
-   ```bash
-   ./setup.bat
-   ```
-   The script will automatically verify Node and Rust, install the Tauri CLI if missing, sync all dependencies, and launch Newtron in dev mode.
-
-3. Press `Alt + N` — Newtron appears instantly.
-
-> ⚠️ If setup.bat errors on Node or Rust, install them from the links above and rerun.
-
----
-
-## Features
-
-### 🧠 AI Command Bar
-Connect your own API keys for OpenAI, Anthropic, or Gemini — stored securely in your OS keychain, never on our servers. Switch models mid-session directly from the bar.
-
-```
-@claude explain this function
-@gpt4o rewrite this email
-@local summarize my clipboard
-```
-
-No account required to get started. Newtron ships with a built-in local AI (via Ollama) that works instantly, offline, and for free.
-
-### 🌐 Embedded Web Search
-Type a query and see real web results — title, snippet, favicon — rendered directly inside Newtron. No browser switch. No context loss. The browser only opens when you pick a result (or press `Shift+Enter` to search in your browser explicitly). Behind the scenes a provider chain — Google Custom Search API (add a free key), Brave API (key), DuckDuckGo, Bing — with automatic fallback and result caching keeps it fast and resilient.
-
-### ⚡ Intelligent URL Autocomplete
-Type `git` and Newtron completes `github.com` as inline ghost text — press `Tab` to accept, `Enter` to go. Suggestions come from an adaptive SQLite index seeded with 250+ popular sites, enriched by your imported browser history (Chrome, Edge, Brave, Firefox, Arc — read-only, never modified), and re-ranked by what you actually open. The more you use it, the better it gets.
-
-### 📁 Lightning-Fast File Search
-Rust-powered local file indexer backed by SQLite. Finds anything on your machine in milliseconds — files, folders, Git repos, system settings.
-
-### 🚀 App Launcher
-Launch any application from the bar. No mouse required.
-
-### 🔒 Private by Design
-- File indexing happens entirely on your machine
-- API keys live in your OS keychain (AES-256)
-- Your queries go directly to the AI provider — no middleman, no logging
-- Local AI mode means nothing leaves your machine at all
-
----
-
-## How It Works
-
-```
-Press Alt + N from anywhere
-           ↓
-┌──────────────────────────────┐
-│  > ________________________  │
-├──────────────────────────────┤
-│  🧠  Ask AI                 │
-│  🌐  Search Google          │
-│  📁  Files matching...      │
-│  🚀  Launch App             │
-└──────────────────────────────┘
-```
-
-One input. Every result type. You choose what to act on.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Core | Rust (Tauri) |
-| Frontend | React + TypeScript |
-| Web Search | Provider chain: Google Custom Search API (BYOK) → Brave API (BYOK) → DuckDuckGo → Bing |
-| URL Index | SQLite (local) — curated seed + browser history + visit learning |
-| Local AI | Ollama |
-| Cloud AI | OpenAI / Anthropic / Gemini (BYOK) |
-| File Index | SQLite (local) |
-| Key Storage | OS Keychain via Tauri `keyring` |
-
----
-
-## AI Setup
-
-Newtron works out of the box with local AI. To connect cloud models, add your own API key in settings — it takes 30 seconds and is stored exclusively in your system keychain. No accounts. No login. No middleman.
-
-| Model | Provider | Free? |
-|---|---|---|
-| Llama 3 / Mistral | Ollama (local) | ✅ Always free |
-| Gemini 1.5 Flash | Google AI Studio | ✅ 1,500 req/day |
-| Gemini 1.5 Pro | Google AI Studio | ✅ 50 req/day |
-| GPT-4o | OpenAI (BYOK) | Your key |
-| Claude 3.5 | Anthropic (BYOK) | Your key |
-
----
-
-## Roadmap to Alpha
-
-- [x] Rust-based global shortcut listener (`Alt + N`)
-- [x] Single-instance guard + desktop launch support
-- [x] Embedded web search results in the dropdown (provider chain with fallback + caching)
-- [x] Intelligent URL autocomplete with inline ghost text (`Tab` to accept)
-- [x] Adaptive SQLite URL index — built-in site catalog + browser history import + visit learning
-- [x] Keyboard-first navigation (`↑↓` navigate, `Enter` open, `Shift+Enter` browser, `Esc` close, `Ctrl+L` focus)
-- [ ] File indexer + SQLite search engine (current file/app results are placeholder data)
-- [ ] Ollama local AI integration
-- [ ] BYOK key manager (OS keychain)
-- [ ] Cloud AI routing (`@model` syntax)
-- [ ] Glassmorphism UI kit + animations
-- [ ] App launcher (OS-level)
-- [ ] Public Alpha Release
+This is a ground-up rebuild of the project, scoped intentionally to two things done well rather than a broad feature set: **fast local search** and **local AI**.
 
 ---
 
 ## Current Status
 
-> 🏗️ **Early Alpha** — [v0.2.0-alpha](https://github.com/b4d1rr/Newtron/releases/tag/v0.2.0-alpha) is available to download. The shell (global shortcut, command bar UI), embedded web search, and adaptive URL autocomplete all work; file search and AI responses are still placeholder stubs while the core engine is built out.
+🏗️ **Pre-development.** The previous prototype has been scrapped and this rebuild is starting from a clean slate. Nothing described below is implemented yet — this document describes the intended direction and serves as the working spec for the build.
 
-Newtron is a closed-contribution project while we finalize the architectural foundation. An open-source call to action is coming with a later release.
-
----
-
-## Privacy & Security
-
-- **Local stays local.** File indexing never leaves your machine.
-- **Your keys, your control.** API keys are stored in your OS native keychain — we never see them.
-- **No accounts.** Newtron uses a BYOK model — no login, no sessions, no tracking.
-- **No middleman.** Queries go directly from your machine to the AI provider.
-- **Offline capable.** Local AI mode works with zero internet connection.
+There is no working build, installer, or release at this stage.
 
 ---
 
-<div align="center">
+## Key Features (Target)
 
-**Newtron — Stop switching tabs. Start thinking faster.**
+### 1. Fast Local Search
 
-</div>
+Open Newtron with a global shortcut and search your computer for files, folders, and applications. The goal is search that feels instant, backed by an indexed database rather than a live filesystem scan on every keystroke.
+
+Planned capabilities:
+
+- File and folder metadata indexing
+- Incremental indexing (only re-index what changed)
+- Filename and path search with prefix, partial, and fuzzy matching
+- Relevance ranking and recently-used/opened results
+- Full keyboard navigation
+- Opening files/folders and launching applications directly from results
+
+### 2. Local AI
+
+Newtron connects to a locally-running LLM through [Ollama](https://ollama.com), so prompts and model responses stay on your machine — no API keys, no accounts, no data leaving your computer.
+
+Planned capabilities:
+
+- Detecting a running Ollama instance and its available models
+- Selecting a model to use
+- Sending prompts and streaming responses back into the command bar
+- Cancelling an in-progress generation
+- Conversation history within a session
+- Optional local file context (asking questions about files on your machine)
+
+---
+
+## Architecture (Planned)
+
+```text
+Global Shortcut
+      ↓
+┌───────────────────────────────────────┐
+│ 🔍 Search files, apps, or ask AI...    │
+├───────────────────────────────────────┤
+│ 📄 Newtron Architecture.pdf            │
+│ 📁 Newtron                             │
+│ 💻 Visual Studio Code                  │
+│ 🤖 Ask local AI: "summarize this..."   │
+└───────────────────────────────────────┘
+```
+
+**Search path:**
+
+```text
+React/TypeScript UI → Tauri → Rust backend → local file index → SQLite / FTS5
+```
+
+**Local AI path:**
+
+```text
+React/TypeScript UI → Tauri → Rust backend → Ollama → local LLM
+```
+
+The UI itself is a minimal, keyboard-first popup — not a headline feature in its own right, just the shell the two capabilities above are delivered through.
+
+---
+
+## Technology Stack (Target)
+
+| Layer         | Technology                  |
+| ------------- | ---------------------------- |
+| Shell         | Tauri v2                     |
+| Backend       | Rust                         |
+| Frontend      | React + TypeScript + Vite    |
+| Styling       | Tailwind CSS                 |
+| File index    | SQLite + SQLite FTS5         |
+| Local AI      | Ollama                       |
+
+This table reflects the intended stack for the rebuild. It will be corrected against the actual codebase (`package.json`, `Cargo.toml`, `tauri.conf.json`) once implementation begins.
+
+---
+
+## Roadmap
+
+### Phase 1 — Foundation
+- [ ] Tauri application shell
+- [ ] React + TypeScript frontend
+- [ ] Rust backend
+- [ ] Frontend ↔ Rust IPC
+- [ ] SQLite database setup
+- [ ] Global shortcut + popup command bar
+
+### Phase 2 — File Indexing
+- [ ] Directory traversal
+- [ ] File metadata extraction
+- [ ] SQLite indexing
+- [ ] Incremental indexing
+- [ ] Handling deleted/moved files
+- [ ] Indexing performance testing
+
+### Phase 3 — Search
+- [ ] SQLite FTS5 integration
+- [ ] Prefix and partial matching
+- [ ] Fuzzy matching
+- [ ] Relevance ranking
+- [ ] Recent-result ranking
+- [ ] Keyboard navigation
+- [ ] Open files/folders, launch apps
+
+### Phase 4 — Local AI
+- [ ] Ollama detection
+- [ ] Model detection and selection
+- [ ] Prompt interface
+- [ ] Streaming responses
+- [ ] Generation cancellation
+- [ ] Conversation history
+- [ ] Local file context
+
+### Phase 5 — Performance & Reliability
+- [ ] Large-filesystem testing
+- [ ] Search latency benchmarking
+- [ ] Indexing/memory/CPU optimization
+- [ ] Error and crash handling
+- [ ] Edge-case testing
+
+### Phase 6 — Release
+- [ ] Installer
+- [ ] Application icon
+- [ ] Versioning and settings persistence
+- [ ] Documentation, screenshots, demo
+- [ ] v1.0.0 release build
+
+---
+
+## Target Milestones
+
+These are development targets, not completed work.
+
+**November 1, 2026 — MVP**
+- Command bar shell
+- Fast local file search
+- Application launching
+- Initial local AI integration (single model via Ollama)
+
+**December 1, 2026 — v1.0**
+- Stable, fast search
+- Reliable incremental indexing
+- Working local AI with conversation history
+- Performance optimization and error handling
+- Packaging and documentation
+
+---
+
+## Development
+
+> Setup instructions will be filled in once the project scaffold exists.
+
+Expected prerequisites, based on the target stack:
+
+- [Node.js (LTS)](https://nodejs.org)
+- [Rust](https://rustup.rs)
+- [Ollama](https://ollama.com) (for local AI, once implemented)
+
+---
+
+## Privacy
+
+Local-first is the point of this rebuild, not an afterthought:
+
+- File indexing is intended to happen entirely on-device.
+- Local AI mode (via Ollama) is designed so prompts and responses never leave your machine.
+- No accounts, no telemetry, no cloud dependency for the core features.
+
+These are design commitments for the rebuild, not verified guarantees until the corresponding code exists.
+
+---
+
+## Contributing
+
+This project is not yet open for contributions while the foundation is being rebuilt. That will change once there's a stable base to build on.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
