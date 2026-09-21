@@ -16,7 +16,7 @@
 
 Newtron is a system-wide command bar. One global shortcut, and you can search every file, folder, and app on your machine — or hand a question to an AI running entirely on your own hardware. No cloud round-trip, no account, no tab switching.
 
-This is a deliberate rebuild. The earlier prototype tried to do too much at once; this version does two things and does them well:
+Newtron is scoped deliberately to two things, done well:
 
 > 🔎 **Fast local search** &nbsp;·&nbsp; 🧠 **Local AI, via Ollama**
 
@@ -24,7 +24,7 @@ This is a deliberate rebuild. The earlier prototype tried to do too much at once
 
 ## 📍 Current Status
 
-**Pre-development.** The previous prototype has been scrapped and this rebuild starts from a clean slate — nothing in this README is implemented yet. Treat it as the working spec, not a changelog.
+**Pre-development.** This document is the working spec for the build, not a changelog — nothing described below is implemented yet.
 
 No build, installer, or release exists at this stage.
 
@@ -208,13 +208,13 @@ Local-first isn't a checkbox here, it's the reason the project exists:
 - Local AI mode (Ollama) means prompts and responses never leave your machine.
 - No accounts, no telemetry, no cloud dependency for either core feature.
 
-These are design commitments for the rebuild — not verified guarantees until the corresponding code ships.
+These are design commitments — not verified guarantees until the corresponding code ships.
 
 ---
 
 ## 🤝 Contributing
 
-Closed to contributions while the foundation gets rebuilt. That changes once there's a stable base to build on.
+Closed to contributions while the foundation is being built. That changes once there's a stable base to build on.
 
 ---
 
