@@ -1,0 +1,12 @@
+# Use LF line endings everywhere so nobody gets fake diffs
+* text=auto eol=lf
+
+# Binary files, don't touch these
+*.png binary
+*.ico binary
+*.icns binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.woff binary
+*.woff2 binary

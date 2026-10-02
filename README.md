@@ -4,7 +4,7 @@
 
 ### Search your machine. Ask your AI. Never leave the keyboard.
 
-[![Status](https://img.shields.io/badge/status-pre--development-orange?style=flat-square)](#current-status)
+[![Status](https://img.shields.io/badge/status-early%20development-orange?style=flat-square)](#current-status)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20v2-24C8DB?style=flat-square)](https://tauri.app)
 [![Rust](https://img.shields.io/badge/backend-Rust-DEA584?style=flat-square)](https://www.rust-lang.org)
@@ -24,9 +24,9 @@ Newtron is scoped deliberately to two things, done well:
 
 ## 📍 Current Status
 
-**Pre-development.** This document is the working spec for the build, not a changelog — nothing described below is implemented yet.
+**Early development.** The Tauri + React shell runs. Search and AI aren't built yet, so everything under "What It Does" is the target, not what exists today.
 
-No build, installer, or release exists at this stage.
+No installer or release yet.
 
 ---
 
@@ -112,9 +112,9 @@ Once code exists, this table gets checked against the real `package.json` / `Car
 <details open>
 <summary><strong>Phase 1 — Foundation</strong></summary>
 
-- [ ] Tauri application shell
-- [ ] React + TypeScript frontend
-- [ ] Rust backend
+- [x] Tauri application shell
+- [x] React + TypeScript frontend
+- [x] Rust backend
 - [ ] Frontend ↔ Rust IPC
 - [ ] SQLite database setup
 - [ ] Global shortcut + popup command bar
@@ -190,13 +190,9 @@ Once code exists, this table gets checked against the real `package.json` / `Car
 
 ## 🛠️ Development
 
-> Setup instructions land here once the project scaffold exists.
+Setup steps are in [`docs/setup.md`](docs/setup.md). How we work (branches, PRs, docs) is in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-Expected prerequisites:
-
-- [Node.js (LTS)](https://nodejs.org)
-- [Rust](https://rustup.rs)
-- [Ollama](https://ollama.com) — for local AI, once implemented
+Ollama is only needed for the local AI part, once we start building it.
 
 ---
 
@@ -214,7 +210,7 @@ These are design commitments — not verified guarantees until the corresponding
 
 ## 🤝 Contributing
 
-Closed to contributions while the foundation is being built. That changes once there's a stable base to build on.
+Closed to outside contributions while the foundation is being built. Team members, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
 
