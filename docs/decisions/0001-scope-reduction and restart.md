@@ -18,7 +18,7 @@ tags: [decision]
 2. **Restart from a clean scaffold with a smaller scope.** Slower on day one, but every piece gets built on purpose and understood.
 
 ## Decision
-Restart from a clean Tauri v2 + React + TypeScript scaffold, and narrow the product to two things done well: **fast local search** (SQLite + FTS5, with app launching) and **local AI through Ollama**.
+Restart from a clean Tauri v2 + React + TypeScript scaffold, and narrow the product to two things done well: **fast local search** (SQLite + FTS5, with app launching) and **local AI**.
 
 New rule: we only merge code we can explain. Tools can help, but if you can't say why a line is there, it doesn't go in.
 
