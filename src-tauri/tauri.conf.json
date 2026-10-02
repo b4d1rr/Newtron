@@ -1,6 +1,7 @@
 {
-  "productName": "Newtron",
-  "version": "0.0.9",
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "newtron",
+  "version": "0.1.0",
   "identifier": "com.newtron.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -11,17 +12,9 @@
   "app": {
     "windows": [
       {
-        "label": "main",
-        "title": "Newtron",
-        "width": 700,
-        "height": 600,
-        "resizable": false,
-        "decorations": false,
-        "transparent": true,
-        "shadow": false,
-        "center": true,
-        "alwaysOnTop": true,
-        "visible": true
+        "title": "newtron",
+        "width": 800,
+        "height": 600
       }
     ],
     "security": {

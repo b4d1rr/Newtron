@@ -5,8 +5,6 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "opener:default",
-    "opener:allow-open-url",
-    "opener:allow-open-path"
+    "opener:default"
   ]
 }
