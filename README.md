@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 [![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20v2-24C8DB?style=flat-square)](https://tauri.app)
 [![Rust](https://img.shields.io/badge/backend-Rust-DEA584?style=flat-square)](https://www.rust-lang.org)
-[![Local AI](https://img.shields.io/badge/AI-100%25%20local-blueviolet?style=flat-square)](#2-local-ai)
+[![Local AI](https://img.shields.io/badge/AI-100%25%20local-blueviolet?style=flat-square)](#-what-it-does-target)
 
 </div>
 
@@ -24,7 +24,20 @@ Newtron is scoped deliberately to two things, done well:
 
 ## 📍 Current Status
 
-**Early development.** The Tauri + React shell runs. Search and AI aren't built yet, so everything under "What It Does" is the target, not what exists today.
+**Early development.** The shell works: Newtron runs from the system tray, `Alt + N` brings up the command bar, and it opens and closes with a short animation that grows out of the search field. Search and AI aren't built yet, so the results dropdown shows placeholder data.
+
+**Works today**
+
+- Tray icon with *Show Newtron* and *Quit Newtron*, starts hidden
+- `Alt + N` shows or hides the bar, `Esc` or clicking anywhere else closes it
+- Minimal dark bar with an animated results dropdown (placeholder results)
+- `Enter` or the globe button opens your text as a web search in your browser
+
+**Not built yet**
+
+- File and app search, app launching
+- Local AI
+- The SQLite index behind search
 
 No installer or release yet.
 
@@ -103,7 +116,7 @@ The command bar itself is deliberately just the shell — minimal, keyboard-firs
 | File index | SQLite + FTS5 |
 | Local AI | Ollama |
 
-Once code exists, this table gets checked against the real `package.json` / `Cargo.toml` / `tauri.conf.json` and corrected if anything's off.
+The table is the plan. What differs so far: styling is plain CSS, and there's no SQLite yet. It gets checked against the real `package.json` / `Cargo.toml` / `tauri.conf.json` as things land.
 
 ---
 
@@ -115,9 +128,9 @@ Once code exists, this table gets checked against the real `package.json` / `Car
 - [x] Tauri application shell
 - [x] React + TypeScript frontend
 - [x] Rust backend
-- [ ] Frontend ↔ Rust IPC
+- [x] Frontend ↔ Rust messaging
 - [ ] SQLite database setup
-- [ ] Global shortcut + popup command bar
+- [x] Global shortcut + popup command bar
 </details>
 
 <details>
@@ -190,9 +203,31 @@ Once code exists, this table gets checked against the real `package.json` / `Car
 
 ## 🛠️ Development
 
-Setup steps are in [`docs/setup.md`](docs/setup.md). How we work (branches, PRs, docs) is in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Windows only for now. Full setup steps are in [`docs/setup.md`](docs/setup.md), and how we work (branches, PRs, docs) is in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+The short version:
+
+```bash
+git clone https://github.com/b4d1rr/Newtron.git
+cd Newtron
+npm ci
+npm run tauri dev
+```
+
+The first build takes a few minutes. Newtron starts hidden in the system tray, so look for its icon (it may be under the ^ arrow), then press `Alt + N`.
 
 Ollama is only needed for the local AI part, once we start building it.
+
+---
+
+## 📚 Docs
+
+Everything about how Newtron is built lives in [`docs/`](docs/):
+
+- [`docs/setup.md`](docs/setup.md) — getting a dev environment running
+- [`docs/modules/`](docs/modules/) — how each part works right now
+- [`docs/decisions/`](docs/decisions/) — why we chose what we chose
+- [`docs/devlog/`](docs/devlog/) — what changed, one entry per PR
 
 ---
 
@@ -204,7 +239,7 @@ Local-first isn't a checkbox here, it's the reason the project exists:
 - Local AI mode (Ollama) means prompts and responses never leave your machine.
 - No accounts, no telemetry, no cloud dependency for either core feature.
 
-These are design commitments — not verified guarantees until the corresponding code ships.
+These are design commitments — not verified guarantees until the corresponding code ships. (The web search button hands your text to your browser and search engine by design, and it's separate from local search.)
 
 ---
 

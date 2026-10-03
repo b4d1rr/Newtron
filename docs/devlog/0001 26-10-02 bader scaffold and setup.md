@@ -1,6 +1,6 @@
 ---
 author: Bader
-date: 2026-10-03
+date: 2026-10-02
 module: infra
 commit: 258296f
 pr: n/a (first commit of the rewrite, pushed straight to main)

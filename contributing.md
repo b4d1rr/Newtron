@@ -81,7 +81,7 @@ Then read your own diff on GitHub first. You'll spot stuff.
 
 Docs go in the same PR as the code. Everything lives in `docs/`.
 
-- **Devlog** (`docs/devlog/`): one per PR. Copy `_templates/devlog.md` and name it `YYYY-MM-DD-yourname-topic.md`.
+- **Devlog** (`docs/devlog/`): one per PR. Copy `_templates/devlog.md` and name it `0000-YYMMDD-NAME-TOPIC.md`.
 - **Module docs** (`docs/modules/`): how a part of the app works *right now*. If you change how it works, update the file.
 - **Decisions** (`docs/decisions/`): when we pick between real options (like a library). Number them in order.
 
