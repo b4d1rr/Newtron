@@ -2,8 +2,8 @@
 author: Bader
 date: 2026-10-04
 module: db
-commit:
-pr: (add the PR link once it's open)
+commit: ba1e37a
+pr: n/a
 tags: [devlog]
 ---
 
