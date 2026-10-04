@@ -24,7 +24,7 @@ Newtron is scoped deliberately to two things, done well:
 
 ## 📍 Current Status
 
-**Early development.** The shell works: Newtron runs from the system tray, `Alt + N` brings up the command bar, and it opens and closes with a short animation that grows out of the search field. Search and AI aren't built yet, so the results dropdown shows placeholder data.
+**Early development.** The shell works: Newtron runs from the system tray, `Alt + N` brings up the command bar, and it opens and closes with a short animation that grows out of the search field. The database foundation for search is in place and tested, but search and AI aren't connected to the bar yet, so the results dropdown still shows placeholder data.
 
 **Works today**
 
@@ -32,12 +32,14 @@ Newtron is scoped deliberately to two things, done well:
 - `Alt + N` shows or hides the bar, `Esc` or clicking anywhere else closes it
 - Minimal dark bar with an animated results dropdown (placeholder results)
 - `Enter` or the globe button opens your text as a web search in your browser
+- SQLite with FTS5 full-text search works in the Rust backend (in memory, covered by a test, not used by the app yet)
 
 **Not built yet**
 
 - File and app search, app launching
 - Local AI
-- The SQLite index behind search
+- The file index: scanning folders, a real files table, and saving the database to disk
+- Connecting the database to the search bar
 
 No installer or release yet.
 
@@ -116,7 +118,7 @@ The command bar itself is deliberately just the shell — minimal, keyboard-firs
 | File index | SQLite + FTS5 |
 | Local AI | Ollama |
 
-The table is the plan. What differs so far: styling is plain CSS, and there's no SQLite yet. It gets checked against the real `package.json` / `Cargo.toml` / `tauri.conf.json` as things land.
+The table is the plan. What differs so far: styling is plain CSS, and SQLite (through the `rusqlite` crate) only runs in memory inside a test. It gets checked against the real `package.json` / `Cargo.toml` / `tauri.conf.json` as things land.
 
 ---
 
@@ -129,7 +131,8 @@ The table is the plan. What differs so far: styling is plain CSS, and there's no
 - [x] React + TypeScript frontend
 - [x] Rust backend
 - [x] Frontend ↔ Rust messaging
-- [ ] SQLite database setup
+- [x] SQLite + FTS5 proof of concept (in memory, tested)
+- [ ] On-disk database in the app's data folder
 - [x] Global shortcut + popup command bar
 </details>
 
@@ -225,7 +228,7 @@ Ollama is only needed for the local AI part, once we start building it.
 Everything about how Newtron is built lives in [`docs/`](docs/):
 
 - [`docs/setup.md`](docs/setup.md) — getting a dev environment running
-- [`docs/modules/`](docs/modules/) — how each part works right now
+- [`docs/modules/`](docs/modules/) — how each part works right now (shell, db)
 - [`docs/decisions/`](docs/decisions/) — why we chose what we chose
 - [`docs/devlog/`](docs/devlog/) — what changed, one entry per PR
 
